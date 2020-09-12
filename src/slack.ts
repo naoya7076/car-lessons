@@ -5,9 +5,17 @@ function getLessonStatus() {
     'CHECK_LESSONS_URL'
   );
   const response = UrlFetchApp.fetch(url);
+  const isOpeningHours = this.checkOpeningHours();
+  if (!isOpeningHours) {
+    Logger.log('サイトがメンテナンス中');
+    return;
+  }
+
   const canReserve: boolean = toBoolean(response.getContentText());
   if (canReserve) {
     sendSlack();
+  } else {
+    Logger.log('空いている予約が無い');
   }
 }
 
@@ -40,26 +48,4 @@ function sendSlack() {
 
 function toBoolean(strResponse: string) {
   return strResponse.toLowerCase() === 'true';
-}
-function checkClosingHours() {
-  const now = Moment.moment();
-  if (isUnderMorningMaintenance(now)) {
-    return false;
-  }
-  const dow = now.isoWeekday();
-  if (dow )
-}
-
-function isUnderNightMaintenanceOnWeekdays() {}
-
-function isUnderNightOnWeekend() {}
-
-function isUnderMorningMaintenance(now: any) {
-  const startMorningMaintenance = Moment.moment('05:00:00');
-  const endMorningMaintenance = Moment.moment('06:00:00');
-  if (now.isBetween(startMorningMaintenance, endMorningMaintenance)) {
-    return false;
-  } else {
-    return true;
-  }
 }
